@@ -1,0 +1,26 @@
+model Character {
+    id            Int               @id @default(autoincrement())
+    name          String
+    surname       String
+    dob           DateTime          @default(now()) @db.Date
+    gender        Gender
+    driverLicense LicenseCategory[] @default([])
+    //age
+    phoneNumber   String?
+    address       String?
+    hasGunPermit  Boolean           @default(false)
+    user          User              @relation(fields: [userId], references: [id])
+    userId        Int               @unique
+}
+
+enum Gender {
+    Male
+    Female
+}
+
+enum LicenseCategory {
+    A
+    B
+    C
+    D
+}
