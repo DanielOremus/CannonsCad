@@ -3,6 +3,14 @@ model User {
   email      String      @unique
   name       String
   password   String
+  status     UserStatus  @default(PENDING)
   createdAt  DateTime    @default(now())
   characters Character[]
+}
+
+enum UserStatus {
+  APPROVED
+  REJECTED
+  PENDING
+  SUSPENDED
 }

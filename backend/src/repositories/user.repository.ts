@@ -1,10 +1,11 @@
-import { Prisma, PrismaClient, type User } from "../generated/prisma/client.js"
-import type { UserDelegate } from "../generated/prisma/models.js"
+import { type User } from "../generated/prisma/client.js"
+import type { UserFindUniqueArgs } from "../generated/prisma/models.js"
 import type { IUserRepository } from "../interfaces/i.user.repository.js"
+import { prisma, type ExtendedPrismaClient } from "../lib/prisma.js"
 
 class UserRepository implements IUserRepository {
-  private prisma: PrismaClient | Prisma.TransactionClient
-  constructor(prisma: PrismaClient | Prisma.TransactionClient) {
+  private prisma: ExtendedPrismaClient
+  constructor(prisma: ExtendedPrismaClient) {
     this.prisma = prisma
   }
   async getById(id: number): Promise<User | null> {
@@ -22,6 +23,9 @@ class UserRepository implements IUserRepository {
   async deleteById(id: number): Promise<void> {
     throw new Error("Method not implemented.")
   }
+  async getUnique(filter: UserFindUniqueArgs): Promise<User | null> {
+    return this.prisma.user.findUnique(filter)
+  }
 }
 
-export default UserRepository
+export default new UserRepository(prisma)

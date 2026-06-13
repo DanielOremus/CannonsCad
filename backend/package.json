@@ -4,33 +4,42 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node ./dist/bin/www.js",
-    "build": "tsc",
-    "dev": "cross-env DEBUG=cannonscad:* nodemon ./dist/bin/www.js"
+    "start": "node dist/bin/www.js",
+    "build": "npm run clean && tsc && npm run copyfiles",
+    "clean": "rimraf dist/",
+    "copyfiles": "copyfiles -u 1 src/**/*.ejs src/**/*.css dist/",
+    "dev": "npm run build && cross-env DEBUG=cannonscad:* nodemon --env-file=.env dist/bin/www.js"
   },
   "dependencies": {
-    "@project/shared": "*",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@project/shared": "*",
+    "bcrypt": "^6.0.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^17.4.2",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.3",
     "morgan": "~1.9.1",
     "pg": "^8.21.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
+    "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/debug": "^4.1.13",
-    "@types/morgan": "^1.9.10",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/ms": "^2.1.0",
     "@types/node": "^25.9.2",
     "@types/pg": "^8.20.0",
+    "copyfiles": "^2.4.1",
     "cross-env": "^10.1.0",
+    "nodemon": "^3.1.14",
     "prisma": "^7.8.0",
+    "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
