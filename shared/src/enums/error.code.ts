@@ -1,0 +1,6 @@
+export enum ErrorCode {
+  NOT_FOUND,
+  VALIDATION_FAILED,
+  UNAUTHORIZED,
+  FORBIDDEN,
+}

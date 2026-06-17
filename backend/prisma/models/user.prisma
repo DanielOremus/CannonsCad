@@ -1,11 +1,13 @@
 model User {
-  id         Int         @id @default(autoincrement())
-  email      String      @unique
-  name       String
-  password   String
-  status     UserStatus  @default(PENDING)
-  createdAt  DateTime    @default(now())
-  characters Character[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String
+  password      String
+  status        UserStatus     @default(PENDING)
+  role          UserRole       @default(REGISTERED)
+  createdAt     DateTime       @default(now())
+  characters    Character[]
+  refreshTokens RefreshToken[]
 }
 
 enum UserStatus {
@@ -13,4 +15,13 @@ enum UserStatus {
   REJECTED
   PENDING
   SUSPENDED
+}
+
+enum UserRole {
+  REGISTERED
+  POLICE
+  DISPATCH
+  EMS
+  CIVILIAN
+  ADMIN
 }

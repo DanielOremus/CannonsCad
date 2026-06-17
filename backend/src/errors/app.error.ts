@@ -1,3 +1,5 @@
+import type z from "zod/v4"
+
 export class AppError extends Error {
   constructor(
     readonly message: string,
@@ -20,7 +22,22 @@ export class ConflictError extends AppError {
   }
 }
 export class UnauthorizedError extends AppError {
-  constructor(message: string = "Invalid credentials") {
+  constructor(message: string = "Unauthorized") {
     super(message, 401)
+  }
+}
+
+export class ForbiddenError extends AppError {
+  constructor(message: string = "Forbidden") {
+    super(message, 403)
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(
+    public issues: z.core.$ZodIssue[],
+    message: string = "Validation failed",
+  ) {
+    super(message, 400)
   }
 }

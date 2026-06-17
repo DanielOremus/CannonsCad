@@ -1,0 +1,7 @@
+model RefreshToken {
+    jti       String   @id
+    sub       Int
+    user      User     @relation(fields: [sub], references: [id], onDelete: Cascade)
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+}

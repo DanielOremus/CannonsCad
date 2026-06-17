@@ -9,7 +9,7 @@ const config = Object.freeze({
           throw new Error("No secret provided for access token")
         return secret
       },
-      expire: process.env.ACCESS_TOKEN_EXPIRE || "15min",
+      expire: process.env.ACCESS_TOKEN_EXPIRE || "15m",
     },
     refresh: {
       get secret() {

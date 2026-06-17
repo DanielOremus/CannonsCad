@@ -1,4 +1,4 @@
-import type { UserPublicDTO } from "@project/shared/src/types/user.dto.js"
+import type { UserMeDTO, UserPublicDTO } from "@project/shared"
 import type { User } from "../generated/prisma/client.js"
 
 class UserMapper {
@@ -6,7 +6,15 @@ class UserMapper {
     return {
       name: user.name,
       status: user.status,
-      createdAt: JSON.stringify(user.createdAt),
+      createdAt: JSON.parse(JSON.stringify(user.createdAt)),
+    }
+  }
+  static toMeDto(user: User): UserMeDTO {
+    return {
+      email: user.email,
+      name: user.name,
+      status: user.status,
+      createdAt: JSON.parse(JSON.stringify(user.createdAt)),
     }
   }
 }

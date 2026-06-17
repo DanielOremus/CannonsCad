@@ -1,9 +1,11 @@
 import { Router } from "express"
-import userRouters from "./users.js"
+import userRoutes from "./users.js"
+import authRoutes from "./auth.js"
 
 const router = Router()
 
-router.use("/users", userRouters)
+router.use("/users", userRoutes)
+router.use("/auth", authRoutes)
 
 router.use("/", function (req, res, next) {
   res.render("index", { title: "Express" })
