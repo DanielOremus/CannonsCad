@@ -6,6 +6,7 @@ class UserMapper {
     return {
       name: user.name,
       status: user.status,
+      role: user.role,
       createdAt: JSON.parse(JSON.stringify(user.createdAt)),
     }
   }
@@ -13,6 +14,7 @@ class UserMapper {
     return {
       email: user.email,
       name: user.name,
+      role: user.role,
       status: user.status,
       createdAt: JSON.parse(JSON.stringify(user.createdAt)),
     }

@@ -1,7 +1,6 @@
 import type { IUserRepository } from "../interfaces/i.user.repository.js"
 import userRepository from "../repositories/user.repository.js"
 import { NotFoundError } from "../errors/app.error.js"
-import type { UserPublicDTO, UserMeDTO } from "@project/shared"
 import UserMapper from "../mappers/user.mapper.js"
 
 class UserService {

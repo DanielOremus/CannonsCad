@@ -5,4 +5,3 @@ export type AuthResponseDTO = {
   access: string
   refresh: string
 }
-export type RefreshResponseDTO = Omit<AuthResponseDTO, "user">
