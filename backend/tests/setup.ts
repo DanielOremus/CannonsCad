@@ -1,9 +1,5 @@
 import { prisma } from "../src/lib/prisma.js"
-import { beforeEach, afterAll, beforeAll } from "vitest"
-
-beforeAll(async () => {
-  await prisma.user.deleteMany()
-})
+import { beforeEach, afterAll } from "vitest"
 
 beforeEach(async () => {
   await prisma.user.deleteMany()

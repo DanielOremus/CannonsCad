@@ -26,9 +26,7 @@ describe("POST /auth/login", () => {
   it("returns 200, user logged in", async () => {
     const user = await createUser()
     console.log(user)
-    const res = await request(app)
-      .post("/auth/login")
-      .send({ email: "test@gmail.com", password: "test" })
+    const res = await request(app).post("/auth/login").send({ email: user.email, password: "test" })
     expect(res.status).equal(200)
     expect(res.body.access).toBeDefined()
     expect(res.body.user).toBeDefined()
@@ -37,9 +35,9 @@ describe("POST /auth/login", () => {
 
 describe("POST /auth/register", () => {
   it("returns 409, user already exists", async () => {
-    await createUser()
+    const { email } = await createUser()
     const res = await request(app).post("/auth/register").send({
-      email: "test@gmail.com",
+      email,
       name: "TestUser",
       password: "test",
       confirmPassword: "test",
