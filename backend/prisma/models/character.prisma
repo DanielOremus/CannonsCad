@@ -1,16 +1,18 @@
 model Character {
-    id            Int               @id @default(autoincrement())
+    id            Int             @id @default(autoincrement())
     name          String
     surname       String
-    dob           DateTime          @default(now()) @db.Date
+    dob           DateTime        @default(now()) @db.Date
     gender        Gender
-    driverLicense LicenseCategory[] @default([])
+    driverLicense DriverLicense?
     //age
     phoneNumber   String?
     address       String?
-    hasGunPermit  Boolean           @default(false)
-    user          User              @relation(fields: [userId], references: [id])
-    userId        Int               @unique
+    hasGunPermit  Boolean         @default(false)
+    flags         CharacterFlag[] @default([])
+    user          User            @relation(fields: [userId], references: [id])
+    userId        Int
+    vehicles      Vehicle[]
 }
 
 enum Gender {
@@ -18,9 +20,8 @@ enum Gender {
     Female
 }
 
-enum LicenseCategory {
-    A
-    B
-    C
-    D
+enum CharacterFlag {
+    MENTAL_HEALTH @map("Mental Health")
+    BOLO
+    WARRANT       @map("Warrant")
 }

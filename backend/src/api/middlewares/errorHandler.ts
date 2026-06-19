@@ -20,28 +20,26 @@ export function globalErrorHandler(
   next: NextFunction,
 ) {
   // set locals, only providing error in development
-  const isProd = appConfig.env === "production"
-
-  if (err instanceof ValidationError) {
-    return res
-      .status(err.statusCode)
-      .json({ message: err.message, issues: err.issues })
-  }
+  const isDev = appConfig.env === "development"
+  let errMessage: string
+  let errStatus: number
 
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ message: err.message })
-  }
-  const message = isProd
-    ? "Something went wrong, please try again later"
-    : err.message
-  const status = "status" in err ? err.status : 500
-
-  if (isProd) {
-    return res.status(status).json({ message })
+    if (err instanceof ValidationError) {
+      if (!isDev)
+        return res.status(err.statusCode).json({ message: err.message, issues: err.issues })
+    } else {
+      if (!isDev) return res.status(err.statusCode).json({ message: err.message })
+    }
+    errMessage = err.message
+    errStatus = err.statusCode
+  } else {
+    errMessage = err.message
+    errStatus = "status" in err ? err.status : 500
   }
   // render the error page
-  res.status(status)
-  res.locals.message = err.message
+  res.status(errStatus)
+  res.locals.message = errMessage
   res.locals.error = err
   res.render("error")
 }

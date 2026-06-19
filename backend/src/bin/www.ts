@@ -1,6 +1,6 @@
 import app from "../app.js"
 import http from "http"
-import { debug } from "../utils/debugger.js"
+import Logger from "../utils/logger.js"
 import { appConfig } from "../config/app.js"
 import type { Application } from "express"
 
@@ -56,7 +56,7 @@ class Server {
     const address = this.server.address()
     if (!address) return
     const bind = typeof address === "string" ? "pipe " + address : "port " + address.port
-    debug("Listening on " + bind)
+    Logger.info("Listening on " + bind)
   }
 }
 
