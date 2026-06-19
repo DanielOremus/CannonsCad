@@ -8,7 +8,7 @@ import {
   getUserRefreshTokens,
 } from "./factories/token.factory.js"
 
-describe.skip("POST /auth/login", () => {
+describe("POST /auth/login", () => {
   it("returns 401, when user not found", async () => {
     const res = await request(app)
       .post("/auth/login")
@@ -35,7 +35,7 @@ describe.skip("POST /auth/login", () => {
   })
 })
 
-describe.skip("POST /auth/register", () => {
+describe("POST /auth/register", () => {
   it("returns 409, user already exists", async () => {
     await createUser()
     const res = await request(app).post("/auth/register").send({
@@ -64,12 +64,15 @@ describe.skip("POST /auth/register", () => {
     expect(dbUser).toBeTruthy()
     expect(res.status).equal(201)
     expect(res.body).toEqual(
-      expect.objectContaining({ user: expect.any(Object), access: expect.any(String) }),
+      expect.objectContaining({
+        user: expect.any(Object),
+        access: expect.any(String),
+      }),
     )
   })
 })
 
-describe.skip("POST /auth/refresh", () => {
+describe("POST /auth/refresh", () => {
   it("returns 401, when refresh token is invalid", async () => {
     const res = await request(app).post("/auth/refresh")
 
@@ -78,12 +81,12 @@ describe.skip("POST /auth/refresh", () => {
 
   it("returns 401, when refresh token has invalid jti", async () => {
     const user = await createUser()
-    const goodToken = generateRefresh(user.id)
-    const dbToken = await createDbRefreshToken(goodToken)
+    const dbToken = await createDbRefreshToken({ sub: user.id })
+    const goodToken = generateRefresh({ jti: dbToken.jti, sub: user.id })
     console.log("Created refresh -------")
     console.log(dbToken)
 
-    const badToken = generateRefresh(user.id, "bad-jti")
+    const badToken = generateRefresh({ sub: user.id, jti: "bad-jti" })
 
     const res = await request(app)
       .post("/auth/refresh")
@@ -99,8 +102,8 @@ describe.skip("POST /auth/refresh", () => {
 
   it("returns 200, when refresh token is valid", async () => {
     const user = await createUser()
-    const goodToken = generateRefresh(user.id)
-    const dbToken = await createDbRefreshToken(goodToken)
+    const dbToken = await createDbRefreshToken({ sub: user.id })
+    const goodToken = generateRefresh({ jti: dbToken.jti, sub: user.id })
     console.log("Created refresh -------")
     console.log(dbToken)
 

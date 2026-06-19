@@ -23,18 +23,22 @@ export function globalErrorHandler(
   const isProd = appConfig.env === "production"
 
   if (err instanceof ValidationError) {
-    return res.status(err.statusCode).json({ message: err.message, issues: err.issues })
+    return res
+      .status(err.statusCode)
+      .json({ message: err.message, issues: err.issues })
   }
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({ message: err.message })
   }
-  const message = isProd ? "Something went wrong, please try again later" : err.message
+  const message = isProd
+    ? "Something went wrong, please try again later"
+    : err.message
   const status = "status" in err ? err.status : 500
 
-  // if (isProd) {
-  return res.status(status).json({ message })
-  // }
+  if (isProd) {
+    return res.status(status).json({ message })
+  }
   // render the error page
   res.status(status)
   res.locals.message = err.message

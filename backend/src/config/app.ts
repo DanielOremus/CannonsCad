@@ -9,7 +9,10 @@ const config = Object.freeze({
           throw new Error("No secret provided for access token")
         return secret
       },
-      expire: process.env.ACCESS_TOKEN_EXPIRE || "15m",
+      get expire() {
+        const v = parseInt(`${process.env.ACCESS_TOKEN_EXPIRE}`)
+        return isFinite(v) ? Math.abs(v) : 60 * 15 //15m
+      },
     },
     refresh: {
       get secret() {
@@ -18,7 +21,10 @@ const config = Object.freeze({
           throw new Error("No secret provided for refresh token")
         return secret
       },
-      expire: process.env.REFRESH_TOKEN_EXPIRE || "7d",
+      get expire() {
+        const v = parseInt(`${process.env.REFRESH_TOKEN_EXPIRE}`)
+        return isFinite(v) ? Math.abs(v) : 3600 * 24 * 7 //7d
+      },
     },
   },
 })

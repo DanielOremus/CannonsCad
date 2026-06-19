@@ -3,7 +3,6 @@ import type { Request, Response } from "express"
 import type AuthService from "../../services/auth.service.js"
 import { appConfig } from "../../config/app.js"
 import type { UserRegisterDTO, UserLoginDTO } from "@project/shared"
-import ms, { type StringValue } from "ms"
 
 class AuthController {
   constructor(private authService: typeof AuthService) {}
@@ -13,7 +12,7 @@ class AuthController {
       httpOnly: true,
       secure: appConfig.env === "production",
       sameSite: "strict",
-      maxAge: ms(appConfig.tokens.refresh.expire as StringValue),
+      maxAge: appConfig.tokens.refresh.expire * 1000,
     })
   }
   register = async (req: Request, res: Response) => {

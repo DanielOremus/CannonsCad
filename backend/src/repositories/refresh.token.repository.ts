@@ -12,9 +12,7 @@ class RefreshTokenRepository implements IRefreshTokenRepository {
     await this.prisma.refreshToken.delete({ where: { jti } })
   }
   async create(dto: RefreshTokenCreateDTO): Promise<RefreshToken> {
-    const token = await this.prisma.refreshToken.create({
-      data: dto,
-    })
+    const token = await this.prisma.refreshToken.customCreate(dto.sub)
     return token
   }
   async deleteAllBySub(sub: number): Promise<void> {

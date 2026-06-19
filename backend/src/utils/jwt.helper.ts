@@ -1,9 +1,6 @@
 import jwt from "jsonwebtoken"
-import { v4 as uuidv4 } from "uuid"
 import { appConfig } from "../config/app.js"
-import ms, { type StringValue } from "ms"
-import type { AccessTokenPayload } from "../types/token.js"
-import type { UserRole } from "@project/shared"
+import type { AccessTokenPayload, RefreshTokenPayload } from "../types/token.js"
 class JWTHelper {
   static tryGetFromBearer(bearer: string | undefined): jwt.JwtPayload | null {
     if (!bearer || !bearer.startsWith("Bearer ")) return null
@@ -24,35 +21,27 @@ class JWTHelper {
       return null
     }
   }
-  static generateRefreshToken(userId: number): {
-    token: string
-    jti: string
-    expiresAt: Date
-  } {
+  static generateRefreshToken(payload: RefreshTokenPayload): string {
     const tokenConfig = appConfig.tokens.refresh
-    const jti = uuidv4()
-    const token = jwt.sign({ sub: userId, jti }, tokenConfig.secret, {
-      expiresIn: tokenConfig.expire as StringValue,
+    const token = jwt.sign(payload, tokenConfig.secret, {
+      expiresIn: tokenConfig.expire,
     })
-    return {
-      token,
-      jti,
-      expiresAt: new Date(Date.now() + ms(tokenConfig.expire as StringValue)),
-    }
+    return token
   }
   static generateAccessToken(payload: AccessTokenPayload): string {
     const tokenConfig = appConfig.tokens.access
     const token = jwt.sign(payload, tokenConfig.secret, {
-      expiresIn: tokenConfig.expire as StringValue,
+      expiresIn: tokenConfig.expire,
     })
     return token
   }
-  static generateTokens(userId: number, userRole: UserRole) {
+  static generateTokens(data: AccessTokenPayload & RefreshTokenPayload) {
+    const { jti, sub, role } = data
     const access = JWTHelper.generateAccessToken({
-      sub: userId,
-      role: userRole,
+      sub,
+      role,
     })
-    const { token: refresh } = JWTHelper.generateRefreshToken(userId)
+    const refresh = JWTHelper.generateRefreshToken({ jti, sub })
     return { access, refresh }
   }
 }

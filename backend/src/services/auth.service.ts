@@ -25,7 +25,14 @@ class AuthService {
       ...userData,
       password: hashedPassword,
     })
-    const { access, refresh } = JWTHelper.generateTokens(user.id, user.role)
+    const dbToken = await this.refreshTokenRepository.create({
+      sub: user.id,
+    })
+    const { access, refresh } = JWTHelper.generateTokens({
+      sub: user.id,
+      jti: dbToken.jti,
+      role: user.role,
+    })
 
     return {
       user: UserMapper.toPublicDto(user),
@@ -41,41 +48,42 @@ class AuthService {
       user.password,
     )
     if (!isPasswordCorrect) throw new UnauthorizedError("Invalid credentials")
-    const { access, refresh } = JWTHelper.generateTokens(user.id, user.role)
+    const dbToken = await this.refreshTokenRepository.create({
+      sub: user.id,
+    })
+    const { access, refresh } = JWTHelper.generateTokens({
+      sub: user.id,
+      jti: dbToken.jti,
+      role: user.role,
+    })
 
     return { user: UserMapper.toPublicDto(user), access, refresh }
   }
   async refresh(rawToken: string): Promise<AuthResponseDTO> {
     const decoded = JWTHelper.tryVerify(rawToken, "refresh")
-    if (!decoded?.jti) throw new UnauthorizedError()
+    if (!decoded || !decoded.jti || !decoded.sub) throw new UnauthorizedError()
     const oldDbToken = await this.refreshTokenRepository.getByJti(decoded.jti)
     if (!oldDbToken) {
       if (decoded.sub)
         await this.refreshTokenRepository.deleteAllBySub(parseInt(decoded.sub))
       throw new UnauthorizedError()
     }
-    const dbUser = await this.userRepository.getById(oldDbToken.sub)
-    if (!dbUser) {
+    const user = await this.userRepository.getById(oldDbToken.sub)
+    if (!user) {
       throw new UnauthorizedError()
     }
     await this.refreshTokenRepository.delete(oldDbToken.jti)
-    const {
-      token: refresh,
-      jti,
-      expiresAt,
-    } = JWTHelper.generateRefreshToken(oldDbToken.sub)
-    const tokenCreateDto: RefreshTokenCreateDTO = {
-      jti,
+    const newDbToken = await this.refreshTokenRepository.create({
       sub: oldDbToken.sub,
-      expiresAt,
-    }
-    await this.refreshTokenRepository.create(tokenCreateDto)
-    const access = JWTHelper.generateAccessToken({
-      sub: oldDbToken.sub,
-      role: dbUser.role,
     })
 
-    return { access, refresh, user: UserMapper.toPublicDto(dbUser) }
+    const { access, refresh } = JWTHelper.generateTokens({
+      jti: newDbToken.jti,
+      role: user.role,
+      sub: user.id,
+    })
+
+    return { access, refresh, user: UserMapper.toPublicDto(user) }
   }
 }
 
