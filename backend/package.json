@@ -9,7 +9,8 @@
     "build": "npm run clean && tsc && npm run copyfiles",
     "clean": "rimraf dist/",
     "copyfiles": "copyfiles -u 1 src/**/*.ejs src/**/*.css dist/",
-    "dev": "npm run build && cross-env DEBUG=cannonscad:* dotenv -e .env nodemon dist/bin/www.js"
+    "dev": "npm run build && cross-env DEBUG=app:backend dotenv -e .env nodemon dist/bin/www.js",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
