@@ -20,7 +20,7 @@ class UserRepository implements IUserRepository {
   async update(dto: User): Promise<User | null> {
     throw new Error("Method not implemented.")
   }
-  async deleteById(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     throw new Error("Method not implemented.")
   }
   async getByEmail(email: string): Promise<User | null> {

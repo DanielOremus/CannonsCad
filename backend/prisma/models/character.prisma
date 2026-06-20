@@ -1,23 +1,24 @@
 model Character {
     id            Int             @id @default(autoincrement())
-    name          String
-    surname       String
+    firstName     String
+    lastName      String
     dob           DateTime        @default(now()) @db.Date
     gender        Gender
+    idNumber      String          @db.Char(5)
     driverLicense DriverLicense?
     //age
     phoneNumber   String?
     address       String?
     hasGunPermit  Boolean         @default(false)
     flags         CharacterFlag[] @default([])
-    user          User            @relation(fields: [userId], references: [id])
     userId        Int
+    user          User            @relation(fields: [userId], references: [id])
     vehicles      Vehicle[]
 }
 
 enum Gender {
-    Male
-    Female
+    MALE   @map("Male")
+    FEMALE @map("Female")
 }
 
 enum CharacterFlag {

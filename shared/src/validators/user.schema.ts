@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const registerSchema = z
   .object({
     email: z.email(),
-    name: z.string().trim().normalize().min(3),
+    name: z.string().trim().min(3),
     password: z.string().regex(/^\S*$/, "Must not contain spaces").min(4),
     confirmPassword: z.string(),
   })

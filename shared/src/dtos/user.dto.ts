@@ -1,5 +1,5 @@
-import type { UserRole } from "../types/user.role.js"
-import type { UserStatus } from "../types/user.status.js"
+import type { UserRole } from "../enums/user.role.js"
+import type { UserStatus } from "../enums/user.status.js"
 
 export type UserMeDTO = UserPublicDTO & { email: string }
 
@@ -8,4 +8,8 @@ export type UserPublicDTO = {
   status: UserStatus
   createdAt: string
   role: UserRole
+}
+
+export type UserMinDTO = {
+  name: String
 }
