@@ -1,7 +1,4 @@
-export interface IBaseRepository<T> {
-  getById(id: number): Promise<T | null>
-  //   getAll(): Promise<T[]>
-  //   create(entity: T): Promise<T>
-  //   update(entity: T): Promise<T>
+export interface IBaseRepository<TEntity> {
+  getById(id: number): Promise<TEntity | null>
   delete(id: number): Promise<void>
 }

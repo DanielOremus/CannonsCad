@@ -11,10 +11,7 @@ class JWTHelper {
       return null
     }
   }
-  static tryVerify(
-    token: string,
-    type: "access" | "refresh",
-  ): jwt.JwtPayload | null {
+  static tryVerify(token: string, type: "access" | "refresh"): jwt.JwtPayload | null {
     try {
       return jwt.verify(token, appConfig.tokens[type].secret) as jwt.JwtPayload
     } catch (error) {
@@ -36,10 +33,9 @@ class JWTHelper {
     return token
   }
   static generateTokens(data: AccessTokenPayload & RefreshTokenPayload) {
-    const { jti, sub, role } = data
+    const { jti, sub } = data
     const access = JWTHelper.generateAccessToken({
       sub,
-      role,
     })
     const refresh = JWTHelper.generateRefreshToken({ jti, sub })
     return { access, refresh }

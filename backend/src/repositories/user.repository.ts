@@ -1,21 +1,28 @@
-import type { UserRegisterDTO } from "@project/shared"
 import { type User } from "../generated/prisma/client.js"
 import type { IUserRepository } from "../interfaces/i.user.repository.js"
 import { prisma, type ExtendedPrismaClient } from "../lib/prisma.js"
+import type { UserEntity } from "../domain/user.entity.js"
+import type { CreateUserInput } from "../types/user.js"
+import { BaseRepository } from "./base.repository.js"
 
-class UserRepository implements IUserRepository {
-  private prisma: ExtendedPrismaClient
+class UserRepository extends BaseRepository<UserEntity, User> implements IUserRepository {
   constructor(prisma: ExtendedPrismaClient) {
-    this.prisma = prisma
+    super(prisma)
   }
-  async getById(id: number): Promise<User | null> {
-    return await this.prisma.user.findUnique({ where: { id } })
+  protected toDomain(raw: User): UserEntity {
+    return raw as UserEntity
   }
-  async getAll(): Promise<User[]> {
-    return await this.prisma.user.findMany()
+  async getById(id: number): Promise<UserEntity | null> {
+    const raw = await this.prisma.user.findUnique({ where: { id } })
+    return raw ? this.toDomain(raw) : null
   }
-  async create(dto: UserRegisterDTO): Promise<User> {
-    return await this.prisma.user.create({ data: dto })
+  async getAll(): Promise<UserEntity[]> {
+    const raws = await this.prisma.user.findMany()
+    return raws.map((raw) => this.toDomain(raw))
+  }
+  async create(data: CreateUserInput): Promise<UserEntity> {
+    const raw = await this.prisma.user.create({ data })
+    return this.toDomain(raw)
   }
   async update(dto: User): Promise<User | null> {
     throw new Error("Method not implemented.")
@@ -23,8 +30,9 @@ class UserRepository implements IUserRepository {
   async delete(id: number): Promise<void> {
     throw new Error("Method not implemented.")
   }
-  async getByEmail(email: string): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { email } })
+  async getByEmail(email: string): Promise<UserEntity | null> {
+    const raw = await this.prisma.user.findUnique({ where: { email } })
+    return raw ? this.toDomain(raw) : null
   }
 }
 

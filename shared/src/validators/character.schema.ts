@@ -43,3 +43,5 @@ export const characterSearchSchema = z.object({
 
 export type CharacterCreateDTO = z.infer<typeof characterCreateSchema>
 export type CharacterSearchDTO = z.infer<typeof characterSearchSchema>
+export type CharacterSearchRequest = z.input<typeof characterSearchSchema>
+export type CharacterCreateRequest = z.input<typeof characterCreateSchema>

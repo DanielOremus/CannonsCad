@@ -1,28 +1,10 @@
-import {
-  type CharacterCardDTO,
-  type CharacterCreateDTO,
-  type OwnersVehicle,
-} from "@project/shared"
-import {
-  Gender,
-  type CharacterFlag,
-  type Character,
-} from "../generated/prisma/client.js"
+import { type CharacterCardDTO, type CharacterCreateDTO } from "@project/shared"
+import { Gender, type CharacterFlag } from "../generated/prisma/client.js"
 import type { CharacterCreateInput } from "../types/character.js"
-import { Prisma } from "../generated/prisma/client.js"
-import { prisma } from "../lib/prisma.js"
-
-type CharacterWithRelations = Prisma.Result<
-  typeof prisma.character,
-  { include: { driverLicense: true; user: true; vehicles: true } },
-  "findFirstOrThrow"
->
+import type { CharacterEntity } from "../domain/character.entity.js"
 
 class CharacterMapper {
-  static toCreateInput(
-    userId: number,
-    dto: CharacterCreateDTO,
-  ): CharacterCreateInput {
+  static toCreateInput(userId: number, dto: CharacterCreateDTO): CharacterCreateInput {
     return {
       ...dto,
       gender: dto.gender as Gender,
@@ -30,13 +12,13 @@ class CharacterMapper {
       flags: dto.flags as CharacterFlag[],
     }
   }
-  static toCardDTO(character: CharacterWithRelations): CharacterCardDTO {
+  static toCardDTO(character: CharacterEntity): CharacterCardDTO {
     return {
       id: character.id,
       firstName: character.firstName,
       lastName: character.lastName,
       gender: character.gender,
-      dob: JSON.parse(JSON.stringify(character.dob)),
+      dob: character.dob.toISOString().slice(0, 10),
       age: character.age,
       idNumber: character.idNumber,
       phoneNumber: character.phoneNumber,

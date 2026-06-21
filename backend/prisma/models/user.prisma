@@ -2,7 +2,7 @@ model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique
   name          String
-  password      String
+  passwordHash  String
   status        UserStatus     @default(PENDING)
   role          UserRole       @default(REGISTERED)
   createdAt     DateTime       @default(now())

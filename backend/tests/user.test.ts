@@ -14,30 +14,24 @@ describe("GET /users/me", () => {
 
   it("returns 403, when !admin tries to get another user", async () => {
     const user = await createUser()
-    const access = generateAccess({ sub: user.id, role: user.role })
-    const res = await request(app)
-      .get(`/users/${user.id}`)
-      .auth(access, { type: "bearer" })
+    const access = generateAccess({ sub: user.id })
+    const res = await request(app).get(`/users/${user.id}`).auth(access, { type: "bearer" })
 
     expect(res.status).equal(403)
   })
 
   it("returns 200, when trying to get own profile", async () => {
     const user = await createUser(UserStatus.PENDING)
-    const access = generateAccess({ sub: user.id, role: user.role })
-    const res = await request(app)
-      .get(`/users/me`)
-      .auth(access, { type: "bearer" })
+    const access = generateAccess({ sub: user.id })
+    const res = await request(app).get(`/users/me`).auth(access, { type: "bearer" })
 
     expect(res.status).equal(200)
   })
 
   it("returns 200, when admin tries to get another user", async () => {
     const user = await createUser(UserStatus.APPROVED, UserRole.ADMIN)
-    const access = generateAccess({ sub: user.id, role: user.role })
-    const res = await request(app)
-      .get(`/users/${user.id}`)
-      .auth(access, { type: "bearer" })
+    const access = generateAccess({ sub: user.id })
+    const res = await request(app).get(`/users/${user.id}`).auth(access, { type: "bearer" })
 
     expect(res.status).equal(200)
   })

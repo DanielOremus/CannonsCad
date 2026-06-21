@@ -1,5 +1,4 @@
 import type { Request, Response, NextFunction } from "express"
-import type { LoggedUser } from "../../types/logged.user.js"
 import JWTHelper from "../../utils/jwt.helper.js"
 import { ForbiddenError, UnauthorizedError } from "../../errors/app.error.js"
 import { type IUserRepository } from "../../interfaces/i.user.repository.js"
@@ -25,13 +24,23 @@ const createAuthGuard =
     switch (roleCheckType) {
       case "priority":
         if (UserRolePriority[dbUser.role] >= UserRolePriority[role]) {
-          res.locals.user = { id: dbUser.id, role: dbUser.role, status: dbUser.status }
+          res.locals.user = {
+            name: dbUser.name,
+            id: dbUser.id,
+            role: dbUser.role,
+            status: dbUser.status,
+          }
           return next()
         }
         break
       case "strict":
         if (dbUser.role === role) {
-          res.locals.user = { id: dbUser.id, role: dbUser.role, status: dbUser.status }
+          res.locals.user = {
+            name: dbUser.name,
+            id: dbUser.id,
+            role: dbUser.role,
+            status: dbUser.status,
+          }
           return next()
         }
         break

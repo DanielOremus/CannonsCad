@@ -3,6 +3,7 @@ import { prisma } from "../../src/lib/prisma.js"
 import { UserRole, type UserRegisterDTO, type UserStatus } from "@project/shared"
 import { hashPassword } from "../../src/utils/hash.js"
 import { v4 as uuidv4 } from "uuid"
+import { CreateUserInput } from "../../src/types/user.js"
 
 export async function createUser(
   status: UserStatus = "APPROVED",
@@ -14,7 +15,12 @@ export async function createUser(
   },
 ): Promise<User> {
   const hashedPassword = await hashPassword(dto.password)
-  return await prisma.user.create({ data: { ...dto, password: hashedPassword, status, role } })
+  const inputData: CreateUserInput = {
+    email: dto.email,
+    name: dto.name,
+    passwordHash: hashedPassword,
+  }
+  return await prisma.user.create({ data: { ...inputData, status, role } })
 }
 
 export async function getUserByEmail(email: string) {

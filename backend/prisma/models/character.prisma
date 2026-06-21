@@ -4,7 +4,7 @@ model Character {
     lastName      String
     dob           DateTime        @default(now()) @db.Date
     gender        Gender
-    idNumber      String          @db.Char(5)
+    idNumber      String          @unique @db.Char(6)
     driverLicense DriverLicense?
     //age
     phoneNumber   String?
@@ -12,17 +12,17 @@ model Character {
     hasGunPermit  Boolean         @default(false)
     flags         CharacterFlag[] @default([])
     userId        Int
-    user          User            @relation(fields: [userId], references: [id])
+    user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
     vehicles      Vehicle[]
 }
 
 enum Gender {
-    MALE   @map("Male")
-    FEMALE @map("Female")
+    MALE
+    FEMALE
 }
 
 enum CharacterFlag {
-    MENTAL_HEALTH @map("Mental Health")
+    MENTAL_HEALTH
     BOLO
-    WARRANT       @map("Warrant")
+    WARRANT
 }

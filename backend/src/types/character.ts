@@ -1,4 +1,6 @@
 import { type CharacterCreateDTO } from "@project/shared"
+import { Prisma } from "../generated/prisma/client.js"
+import { prisma } from "../lib/prisma.js"
 
 const CHARACTER_INCLUDE = {
   driverLicense: true,

@@ -15,18 +15,14 @@ class AuthController {
       maxAge: appConfig.tokens.refresh.expire * 1000,
     })
   }
-  register = async (req: Request, res: Response) => {
-    const userData = req.body as UserRegisterDTO
-
-    const { user, access, refresh } = await this.authService.register(userData)
+  register = async (req: Request<{}, {}, UserRegisterDTO>, res: Response) => {
+    const { user, access, refresh } = await this.authService.register(req.body)
 
     this.setRefreshTokenCookie(res, refresh)
     res.status(201).json({ user, access })
   }
-  login = async (req: Request, res: Response) => {
-    const userData = req.body as UserLoginDTO
-
-    const { user, access, refresh } = await this.authService.login(userData)
+  login = async (req: Request<{}, {}, UserLoginDTO>, res: Response) => {
+    const { user, access, refresh } = await this.authService.login(req.body)
 
     this.setRefreshTokenCookie(res, refresh)
     res.status(200).json({ user, access })

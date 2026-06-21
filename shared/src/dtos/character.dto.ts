@@ -2,7 +2,7 @@ import type { CharacterFlag, Gender } from "../enums/character.js"
 import type { BaseDTO } from "./base.dto.js"
 import type { CharactersDriverLicenseDTO } from "./driver.license.dto.js"
 import type { UserMinDTO } from "./user.dto.js"
-import type { OwnersVehicle } from "./vehicle.dto.js"
+import type { OwnersVehicleDTO } from "./vehicle.dto.js"
 
 export type CharacterCardDTO = BaseDTO & {
   firstName: string
@@ -17,5 +17,5 @@ export type CharacterCardDTO = BaseDTO & {
   hasGunPermit: boolean
   flags: CharacterFlag[]
   user: UserMinDTO | null
-  vehicles: OwnersVehicle[]
+  vehicles: OwnersVehicleDTO[]
 }

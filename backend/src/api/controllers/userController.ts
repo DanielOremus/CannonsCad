@@ -1,6 +1,7 @@
 import type UserService from "../../services/user.service.js"
 import type { Request, Response } from "express"
 import userService from "../../services/user.service.js"
+import { parseId } from "../../utils/parseId.js"
 
 class UserController {
   constructor(private userService: typeof UserService) {}
@@ -9,7 +10,8 @@ class UserController {
     res.json(user)
   }
   getUserById = async (req: Request, res: Response) => {
-    const user = await this.userService.getById(parseInt(req.params.id as string), "public")
+    const id = parseId(req.params.id as string)
+    const user = await this.userService.getById(id, "public")
     res.json(user)
   }
 }

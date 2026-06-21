@@ -3,7 +3,7 @@ import app from "../src/app.js"
 import { describe, it, expect } from "vitest"
 import { createUser, getUserByEmail } from "./factories/user.factory.js"
 import {
-  createDbRefreshToken,
+  createRefreshToken,
   generateRefresh,
   getUserRefreshTokens,
 } from "./factories/token.factory.js"
@@ -25,7 +25,6 @@ describe("POST /auth/login", () => {
 
   it("returns 200, user logged in", async () => {
     const user = await createUser()
-    console.log(user)
     const res = await request(app).post("/auth/login").send({ email: user.email, password: "test" })
     expect(res.status).equal(200)
     expect(res.body.access).toBeDefined()
@@ -79,10 +78,7 @@ describe("POST /auth/refresh", () => {
 
   it("returns 401, when refresh token has invalid jti", async () => {
     const user = await createUser()
-    const dbToken = await createDbRefreshToken({ sub: user.id })
-    const goodToken = generateRefresh({ jti: dbToken.jti, sub: user.id })
-    console.log("Created refresh -------")
-    console.log(dbToken)
+    await createRefreshToken({ sub: user.id })
 
     const badToken = generateRefresh({ sub: user.id, jti: "bad-jti" })
 
@@ -90,9 +86,7 @@ describe("POST /auth/refresh", () => {
       .post("/auth/refresh")
       .set("Cookie", [`refresh=${badToken}`])
 
-    console.log("Tokens after bad refresh -------")
     const userTokens = await getUserRefreshTokens(user.id)
-    console.log(userTokens)
 
     expect(res.status).equal(401)
     expect(userTokens.length).toEqual(0)
@@ -100,10 +94,8 @@ describe("POST /auth/refresh", () => {
 
   it("returns 200, when refresh token is valid", async () => {
     const user = await createUser()
-    const dbToken = await createDbRefreshToken({ sub: user.id })
+    const dbToken = await createRefreshToken({ sub: user.id })
     const goodToken = generateRefresh({ jti: dbToken.jti, sub: user.id })
-    console.log("Created refresh -------")
-    console.log(dbToken)
 
     const res = await request(app)
       .post("/auth/refresh")
@@ -111,5 +103,8 @@ describe("POST /auth/refresh", () => {
 
     expect(res.status).equal(200)
     expect(res.body).toBeTypeOf("string")
+    expect(res.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringMatching(/^refresh=/)]),
+    )
   })
 })
