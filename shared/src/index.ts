@@ -21,3 +21,8 @@ export {
   type CharacterCreateDTO,
   type CharacterSearchDTO,
 } from "./validators/character.schema.js"
+export {
+  paginationSchema,
+  type PaginationDTO,
+  type PaginationRequest,
+} from "./validators/pagination.schema.js"

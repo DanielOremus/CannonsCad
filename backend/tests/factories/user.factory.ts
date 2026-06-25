@@ -1,28 +1,39 @@
 import { User } from "../../src/generated/prisma/client.js"
 import { prisma } from "../../src/lib/prisma.js"
-import { UserRole, type UserRegisterDTO, type UserStatus } from "@project/shared"
+import { UserRole, UserStatus, type UserRegisterDTO } from "@project/shared"
 import { hashPassword } from "../../src/utils/hash.js"
-import { v4 as uuidv4 } from "uuid"
-import { CreateUserInput } from "../../src/types/user.js"
+import { UserCreateInput } from "../../src/types/user.js"
+import { generateAccess } from "./token.factory.js"
+import { userCreateData } from "../constants/user.js"
 
-export async function createUser(
-  status: UserStatus = "APPROVED",
-  role: UserRole = UserRole.REGISTERED,
-  dto: UserRegisterDTO = {
-    email: `test-${uuidv4()}@gmail.com`,
-    name: "test",
-    password: "test",
-  },
-): Promise<User> {
-  const hashedPassword = await hashPassword(dto.password)
-  const inputData: CreateUserInput = {
-    email: dto.email,
-    name: dto.name,
+async function prepareUserCreateInput(data: UserRegisterDTO): Promise<UserCreateInput> {
+  const hashedPassword = await hashPassword(data.password)
+  return {
+    email: data.email,
+    name: data.name,
     passwordHash: hashedPassword,
   }
-  return await prisma.user.create({ data: { ...inputData, status, role } })
 }
 
-export async function getUserByEmail(email: string) {
+export async function createUser(data: UserRegisterDTO = userCreateData): Promise<User> {
+  const input = await prepareUserCreateInput(data)
+  return await prisma.user.create({ data: input })
+}
+
+export async function register(role?: UserRole) {
+  let user
+  if (role) user = await createUserWithRole(role)
+  else user = await createUser()
+
+  const access = generateAccess({ sub: user.id })
+  return { user, access }
+}
+
+export async function createUserWithRole(role: UserRole, data: UserRegisterDTO = userCreateData) {
+  const input = await prepareUserCreateInput(data)
+  return await prisma.user.create({ data: { ...input, status: UserStatus.APPROVED, role } })
+}
+
+export async function getByEmail(email: string) {
   return await prisma.user.findUnique({ where: { email } })
 }

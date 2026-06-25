@@ -1,4 +1,5 @@
-export interface IBaseRepository<TEntity> {
-  getById(id: number): Promise<TEntity | null>
-  delete(id: number): Promise<void>
+import type { ExtendedTransactionClient } from "../lib/prisma.js"
+
+export interface IBaseRepository {
+  transaction<T>(fn: (tx: ExtendedTransactionClient) => Promise<T>): Promise<T>
 }

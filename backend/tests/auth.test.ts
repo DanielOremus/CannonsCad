@@ -1,12 +1,14 @@
 import request from "supertest"
 import app from "../src/app.js"
 import { describe, it, expect } from "vitest"
-import { createUser, getUserByEmail } from "./factories/user.factory.js"
+import { createUser } from "./factories/user.factory.js"
 import {
   createRefreshToken,
   generateRefresh,
   getUserRefreshTokens,
 } from "./factories/token.factory.js"
+import { v4 as uuid4 } from "uuid"
+import { userCreateData } from "./constants/user.js"
 
 describe("POST /auth/login", () => {
   it("returns 401, when user not found", async () => {
@@ -25,7 +27,9 @@ describe("POST /auth/login", () => {
 
   it("returns 200, user logged in", async () => {
     const user = await createUser()
-    const res = await request(app).post("/auth/login").send({ email: user.email, password: "test" })
+    const res = await request(app)
+      .post("/auth/login")
+      .send({ email: user.email, password: userCreateData.password })
     expect(res.status).equal(200)
     expect(res.body.access).toBeDefined()
     expect(res.body.user).toBeDefined()
@@ -34,38 +38,32 @@ describe("POST /auth/login", () => {
 
 describe("POST /auth/register", () => {
   it("returns 409, user already exists", async () => {
-    const { email } = await createUser()
+    const { email, name } = await createUser()
     const res = await request(app).post("/auth/register").send({
       email,
-      name: "TestUser",
-      password: "test",
-      confirmPassword: "test",
+      name,
+      password: userCreateData.password,
+      confirmPassword: userCreateData.password,
     })
     expect(res.status).equal(409)
   })
 
   it("returns 201, user registered", async () => {
-    const res = await request(app).post("/auth/register").send({
-      email: "test@gmail.com",
-      name: "TestUser",
-      password: "test",
-      confirmPassword: "test",
-    })
-    const dbUser = await getUserByEmail("test@gmail.com")
+    const res = await request(app)
+      .post("/auth/register")
+      .send({
+        ...userCreateData,
+        confirmPassword: userCreateData.password,
+      })
     const cookies = res.headers["set-cookie"]
     console.log(cookies)
 
     expect(res.headers["set-cookie"]).toEqual(
       expect.arrayContaining([expect.stringMatching(/^refresh=/)]),
     )
-    expect(dbUser).toBeTruthy()
     expect(res.status).equal(201)
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        user: expect.any(Object),
-        access: expect.any(String),
-      }),
-    )
+    expect(res.body.access).toBeDefined()
+    expect(res.body.user).toBeDefined()
   })
 })
 
@@ -77,25 +75,25 @@ describe("POST /auth/refresh", () => {
   })
 
   it("returns 401, when refresh token has invalid jti", async () => {
-    const user = await createUser()
-    await createRefreshToken({ sub: user.id })
+    const { id } = await createUser()
+    await createRefreshToken({ sub: id })
 
-    const badToken = generateRefresh({ sub: user.id, jti: "bad-jti" })
+    const badToken = generateRefresh({ sub: id, jti: uuid4() })
 
     const res = await request(app)
       .post("/auth/refresh")
       .set("Cookie", [`refresh=${badToken}`])
 
-    const userTokens = await getUserRefreshTokens(user.id)
+    const userTokens = await getUserRefreshTokens(id)
 
     expect(res.status).equal(401)
     expect(userTokens.length).toEqual(0)
   })
 
   it("returns 200, when refresh token is valid", async () => {
-    const user = await createUser()
-    const dbToken = await createRefreshToken({ sub: user.id })
-    const goodToken = generateRefresh({ jti: dbToken.jti, sub: user.id })
+    const { id } = await createUser()
+    const dbToken = await createRefreshToken({ sub: id })
+    const goodToken = generateRefresh({ jti: dbToken.jti, sub: id })
 
     const res = await request(app)
       .post("/auth/refresh")

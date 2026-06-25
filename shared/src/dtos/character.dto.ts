@@ -1,6 +1,7 @@
 import type { CharacterFlag, Gender } from "../enums/character.js"
 import type { BaseDTO } from "./base.dto.js"
 import type { CharactersDriverLicenseDTO } from "./driver.license.dto.js"
+import type { PaginatedResponse } from "./pagination.dto.js"
 import type { UserMinDTO } from "./user.dto.js"
 import type { OwnersVehicleDTO } from "./vehicle.dto.js"
 
@@ -19,3 +20,16 @@ export type CharacterCardDTO = BaseDTO & {
   user: UserMinDTO | null
   vehicles: OwnersVehicleDTO[]
 }
+
+export type CharacterListItemDTO = BaseDTO & {
+  firstName: string
+  lastName: string
+  dob: string
+  age: number
+  gender: Gender
+  idNumber: string
+  flags: CharacterFlag[]
+  user: UserMinDTO | null
+}
+
+export type CharacterListDTO = PaginatedResponse<CharacterListItemDTO>

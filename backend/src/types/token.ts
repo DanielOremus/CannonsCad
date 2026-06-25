@@ -1,4 +1,4 @@
-export type AccessTokenPayload = { sub: number }
-export type RefreshTokenPayload = { sub: number; jti: string }
+export type AccessPayload = { sub: string }
+export type RefreshPayload = { sub: string; jti: string }
 
-export type RefreshTokenCreateDTO = { sub: number }
+export type RefreshCreateInput = { sub: string }

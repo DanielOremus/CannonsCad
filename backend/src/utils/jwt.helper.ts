@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import { appConfig } from "../config/app.js"
-import type { AccessTokenPayload, RefreshTokenPayload } from "../types/token.js"
+import type { AccessPayload, RefreshPayload } from "../types/token.js"
 class JWTHelper {
   static tryGetFromBearer(bearer: string | undefined): jwt.JwtPayload | null {
     if (!bearer || !bearer.startsWith("Bearer ")) return null
@@ -18,21 +18,21 @@ class JWTHelper {
       return null
     }
   }
-  static generateRefreshToken(payload: RefreshTokenPayload): string {
+  static generateRefreshToken(payload: RefreshPayload): string {
     const tokenConfig = appConfig.tokens.refresh
     const token = jwt.sign(payload, tokenConfig.secret, {
       expiresIn: tokenConfig.expire,
     })
     return token
   }
-  static generateAccessToken(payload: AccessTokenPayload): string {
+  static generateAccessToken(payload: AccessPayload): string {
     const tokenConfig = appConfig.tokens.access
     const token = jwt.sign(payload, tokenConfig.secret, {
       expiresIn: tokenConfig.expire,
     })
     return token
   }
-  static generateTokens(data: AccessTokenPayload & RefreshTokenPayload) {
+  static generateTokens(data: AccessPayload & RefreshPayload) {
     const { jti, sub } = data
     const access = JWTHelper.generateAccessToken({
       sub,

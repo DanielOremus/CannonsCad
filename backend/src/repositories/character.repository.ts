@@ -1,6 +1,6 @@
 import { type ICharacterRepository } from "../interfaces/i.character.repository.js"
 import { Prisma } from "../generated/prisma/client.js"
-import { prisma, type ExtendedPrismaClient } from "../lib/prisma.js"
+import { prisma, type DbClient, type ExtendedPrismaClient } from "../lib/prisma.js"
 import type { CharacterCreateInput } from "../types/character.js"
 import { type RawCharacter } from "../types/character.js"
 import type { CharacterEntity } from "../domain/character.entity.js"
@@ -12,6 +12,7 @@ import type {
   UserRole,
   UserStatus,
   CharacterSearchDTO,
+  PaginationDTO,
 } from "@project/shared"
 import type { VehicleEntity } from "../domain/vehicle.entity.js"
 
@@ -51,6 +52,7 @@ class CharacterRepository
             id: raw.user.id,
             name: raw.user.name,
             email: raw.user.email,
+            emailConfirmed: raw.user.emailConfirmed,
             role: raw.user.role as UserRole,
             status: raw.user.status as UserStatus,
             createdAt: raw.user.createdAt,
@@ -65,7 +67,7 @@ class CharacterRepository
       })) as VehicleEntity[],
     }
   }
-  async getByNameAndDob(dto: CharacterSearchDTO): Promise<CharacterEntity | null> {
+  async findByNameAndDob(dto: CharacterSearchDTO): Promise<CharacterEntity | null> {
     const raw = await this.prisma.character.findFirst({
       where: {
         AND: {
@@ -78,18 +80,37 @@ class CharacterRepository
     })
     return raw ? this.toDomain(raw) : null
   }
-  async create(data: CharacterCreateInput): Promise<CharacterEntity> {
-    const raw = await this.prisma.character.create({ data, include: CHARACTER_INCLUDE })
+  async create(
+    data: CharacterCreateInput,
+    client: DbClient = this.prisma,
+  ): Promise<CharacterEntity> {
+    const raw = await client.character.create({
+      data,
+      include: CHARACTER_INCLUDE,
+    })
     return this.toDomain(raw)
   }
-  async getByIdNumber(idNumber: string): Promise<CharacterEntity | null> {
+  async findByIdNumber(idNumber: string): Promise<CharacterEntity | null> {
     const raw = await this.prisma.character.findUnique({
       where: { idNumber },
       include: CHARACTER_INCLUDE,
     })
     return raw ? this.toDomain(raw) : null
   }
-  async getById(id: number): Promise<CharacterEntity | null> {
+  async findMany(
+    pagination: PaginationDTO,
+    userId?: string,
+  ): Promise<{ items: CharacterEntity[]; total: number }> {
+    const where = userId ? { userId } : {}
+    const { limit, page } = pagination
+    const skip = (page - 1) * limit
+    const [raws, total] = await Promise.all([
+      this.prisma.character.findMany({ where, include: CHARACTER_INCLUDE, take: limit, skip }),
+      this.prisma.character.count({ where }),
+    ])
+    return { items: raws.map((c) => this.toDomain(c)), total: total }
+  }
+  async findById(id: number): Promise<CharacterEntity | null> {
     const raw = await this.prisma.character.findUnique({
       where: { id },
       include: CHARACTER_INCLUDE,

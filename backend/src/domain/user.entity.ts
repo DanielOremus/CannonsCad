@@ -1,11 +1,14 @@
 import type { UserRole, UserStatus } from "@project/shared"
-import type { BaseEntity } from "./base.entity.js"
+import type { BaseEntityUuid } from "./base.entity.js"
 
-export type UserEntity = BaseEntity & {
-  name: string
-  email: string
-  role: UserRole
-  status: UserStatus
-  passwordHash: string
-  createdAt: Date
-}
+export type UserEntity = Readonly<
+  BaseEntityUuid & {
+    name: string
+    email: string
+    role: UserRole
+    status: UserStatus
+    emailConfirmed: boolean
+    passwordHash: string
+    createdAt: Date
+  }
+>

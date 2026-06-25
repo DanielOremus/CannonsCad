@@ -14,4 +14,4 @@ export type RawCharacter = Prisma.Result<
   "findFirst"
 >
 
-export type CharacterCreateInput = CharacterCreateDTO & { userId: number }
+export type CharacterCreateInput = CharacterCreateDTO & { userId: string }

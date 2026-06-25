@@ -8,31 +8,51 @@ import UserMapper from "../mappers/user.mapper.js"
 import { comparePassword, hashPassword } from "../utils/hash.js"
 import JWTHelper from "../utils/jwt.helper.js"
 import { ConflictError, UnauthorizedError } from "../errors/app.error.js"
-import type { CreateUserInput } from "../types/user.js"
+import type { UserCreateInput } from "../types/user.js"
+import emailSender from "../utils/email.sender.js"
+import type EmailSender from "../utils/email.sender.js"
+import type { UserEntity } from "../domain/user.entity.js"
+import type { RefreshTokenEntity } from "../domain/refresh.token.entity.js"
 
 class AuthService {
   constructor(
     private userRepository: IUserRepository,
     private refreshTokenRepository: IRefreshTokenRepository,
+    private emailSender: typeof EmailSender,
   ) {}
   async register(userData: UserRegisterDTO): Promise<AuthResponseDTO> {
-    const exists = await this.userRepository.getByEmail(userData.email)
+    const exists = await this.userRepository.findByEmail(userData.email)
     if (exists) {
       throw new ConflictError("User with this email already exists")
     }
     const hashedPassword = await hashPassword(userData.password)
-    const createInput: CreateUserInput = {
+    const createInput: UserCreateInput = {
       email: userData.email,
       name: userData.name,
       passwordHash: hashedPassword,
     }
-    const user = await this.userRepository.create(createInput)
-    const dbToken = await this.refreshTokenRepository.create({
-      sub: user.id,
+    const { user, refreshToken } = await this.userRepository.transaction<{
+      user: UserEntity
+      refreshToken: RefreshTokenEntity
+    }>(async (tx) => {
+      const user = await this.userRepository.create(createInput, tx)
+      const refreshToken = await this.refreshTokenRepository.create(
+        {
+          sub: user.id,
+        },
+        tx,
+      )
+      const code = 456789 //create code and add to db
+      await this.emailSender.sendNotification("emailConfirm", {
+        target: user.email,
+        userName: user.name,
+        code,
+      })
+      return { user, refreshToken }
     })
     const { access, refresh } = JWTHelper.generateTokens({
       sub: user.id,
-      jti: dbToken.jti,
+      jti: refreshToken.jti,
     })
 
     return {
@@ -42,7 +62,7 @@ class AuthService {
     }
   }
   async login(userData: UserLoginDTO): Promise<AuthResponseDTO> {
-    const user = await this.userRepository.getByEmail(userData.email)
+    const user = await this.userRepository.findByEmail(userData.email)
     if (!user) throw new UnauthorizedError("Invalid credentials")
     const isPasswordCorrect = await comparePassword(userData.password, user.passwordHash)
     if (!isPasswordCorrect) throw new UnauthorizedError("Invalid credentials")
@@ -59,12 +79,12 @@ class AuthService {
   async refresh(rawToken: string): Promise<AuthResponseDTO> {
     const decoded = JWTHelper.tryVerify(rawToken, "refresh")
     if (!decoded || !decoded.jti || !decoded.sub) throw new UnauthorizedError()
-    const oldDbToken = await this.refreshTokenRepository.getByJti(decoded.jti)
+    const oldDbToken = await this.refreshTokenRepository.findByJti(decoded.jti)
     if (!oldDbToken) {
-      if (decoded.sub) await this.refreshTokenRepository.deleteAllBySub(parseInt(decoded.sub))
+      if (decoded.sub) await this.refreshTokenRepository.deleteAllBySub(decoded.sub)
       throw new UnauthorizedError()
     }
-    const user = await this.userRepository.getById(oldDbToken.sub)
+    const user = await this.userRepository.findById(oldDbToken.sub)
     if (!user) {
       throw new UnauthorizedError()
     }
@@ -82,4 +102,4 @@ class AuthService {
   }
 }
 
-export default new AuthService(userRepository, refreshTokenRepository)
+export default new AuthService(userRepository, refreshTokenRepository, emailSender)

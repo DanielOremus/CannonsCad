@@ -4,6 +4,7 @@ import { ForbiddenError, UnauthorizedError } from "../../errors/app.error.js"
 import { type IUserRepository } from "../../interfaces/i.user.repository.js"
 import { UserRole, UserRolePriority, UserStatus } from "@project/shared"
 import userRepository from "../../repositories/user.repository.js"
+import type { UserEntity } from "../../domain/user.entity.js"
 
 const createAuthGuard =
   (userRepository: IUserRepository) =>
@@ -17,9 +18,9 @@ const createAuthGuard =
     const decoded = JWTHelper.tryGetFromBearer(bearer)
     if (!decoded || !decoded.sub) return next(new UnauthorizedError())
 
-    const dbUser = await userRepository.getById(parseInt(decoded.sub))
+    const dbUser = await userRepository.findById(decoded.sub)
     if (!dbUser) return next(new UnauthorizedError())
-    if (onlyWhenApproved && dbUser.status !== UserStatus.APPROVED) return next(new ForbiddenError())
+    if (!isAccountActive(dbUser)) return next(new ForbiddenError())
 
     switch (roleCheckType) {
       case "priority":
@@ -47,5 +48,9 @@ const createAuthGuard =
     }
     return next(new ForbiddenError())
   }
+
+function isAccountActive(user: UserEntity) {
+  return user.emailConfirmed && user.status === UserStatus.APPROVED
+}
 
 export const authGuard = createAuthGuard(userRepository)

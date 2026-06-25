@@ -1,7 +1,6 @@
 import { CharacterCreateDTO } from "@project/shared"
 import { prisma } from "../../src/lib/prisma"
 import { CharacterCreateInput } from "../../src/types/character"
-import { characterCreateData } from "../constants/character"
 
 export async function createCharacter(data: CharacterCreateInput) {
   return await prisma.character.create({ data })
@@ -13,7 +12,7 @@ export async function createCharacterWithRelations(data: CharacterCreateInput) {
   })
 }
 export function getCharacterCreateInput(
-  userId: number,
+  userId: string,
   dto: CharacterCreateDTO,
 ): CharacterCreateInput {
   return { ...dto, userId }

@@ -7,6 +7,12 @@ import { authGuard } from "../middlewares/auth.guard.js"
 
 const router = Router()
 
+router.get(
+  "/my",
+  authGuard(true, "priority", UserRole.CIVILIAN),
+  catchAsync(characterController.getMy),
+)
+
 router.post(
   "/search",
   authGuard(true, "priority", UserRole.POLICE),
@@ -15,7 +21,7 @@ router.post(
 )
 router.post(
   "/create",
-  authGuard(true, "priority", UserRole.POLICE),
+  authGuard(true, "priority", UserRole.CIVILIAN),
   validateBody(characterCreateSchema),
   catchAsync(characterController.create),
 )

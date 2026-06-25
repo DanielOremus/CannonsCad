@@ -1,4 +1,4 @@
-const config = Object.freeze({
+const config = {
   port: process.env.PORT || "3000",
   env: process.env.ENV,
   tokens: {
@@ -27,6 +27,6 @@ const config = Object.freeze({
       },
     },
   },
-})
+} as const
 
 export { config as appConfig }

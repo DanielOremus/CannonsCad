@@ -11,7 +11,7 @@ model Character {
     address       String?
     hasGunPermit  Boolean         @default(false)
     flags         CharacterFlag[] @default([])
-    userId        Int
+    userId        String          @db.Uuid
     user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
     vehicles      Vehicle[]
 }

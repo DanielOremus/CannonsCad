@@ -1,6 +1,6 @@
 model RefreshToken {
-    jti       String   @id
-    sub       Int
+    jti       String   @id @default(uuid()) @db.Uuid
+    sub       String   @db.Uuid
     user      User     @relation(fields: [sub], references: [id], onDelete: Cascade)
     expiresAt DateTime
     createdAt DateTime @default(now())

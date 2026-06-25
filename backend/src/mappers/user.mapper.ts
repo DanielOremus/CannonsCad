@@ -1,6 +1,5 @@
-import type { UserMeDTO, UserPublicDTO, UserRegisterDTO } from "@project/shared"
+import type { UserMeDTO, UserPublicDTO } from "@project/shared"
 import type { UserEntity } from "../domain/user.entity.js"
-import type { CreateUserInput } from "../types/user.js"
 
 class UserMapper {
   static toPublicDto(user: UserEntity): UserPublicDTO {
