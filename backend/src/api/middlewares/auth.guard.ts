@@ -26,10 +26,10 @@ const createAuthGuard =
       case "priority":
         if (UserRolePriority[dbUser.role] >= UserRolePriority[role]) {
           res.locals.user = {
-            name: dbUser.name,
             id: dbUser.id,
+            name: dbUser.name,
+            email: dbUser.email,
             role: dbUser.role,
-            status: dbUser.status,
           }
           return next()
         }

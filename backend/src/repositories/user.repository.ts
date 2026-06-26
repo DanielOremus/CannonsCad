@@ -1,17 +1,24 @@
 import { type User } from "../generated/prisma/client.js"
 import type { IUserRepository } from "../interfaces/i.user.repository.js"
-import { prisma, type DbClient, type ExtendedPrismaClient } from "../lib/prisma.js"
+import {
+  prisma,
+  type DbClient,
+  type ExtendedPrismaClient,
+} from "../lib/prisma.js"
 import type { UserEntity } from "../domain/user.entity.js"
 import type { UserCreateInput, UserUpdateInput } from "../types/user.js"
 import { BaseRepository } from "./base.repository.js"
 
-class UserRepository extends BaseRepository<UserEntity, User> implements IUserRepository {
+class UserRepository
+  extends BaseRepository<UserEntity, User>
+  implements IUserRepository
+{
   constructor(prisma: ExtendedPrismaClient) {
     super(prisma)
   }
 
   protected toDomain(raw: User): UserEntity {
-    return raw as UserEntity
+    return { ...raw }
   }
   async findById(id: string): Promise<UserEntity | null> {
     const raw = await this.prisma.user.findUnique({ where: { id } })
@@ -21,7 +28,10 @@ class UserRepository extends BaseRepository<UserEntity, User> implements IUserRe
     const raws = await this.prisma.user.findMany()
     return raws.map((raw) => this.toDomain(raw))
   }
-  async create(data: UserCreateInput, client: DbClient = this.prisma): Promise<UserEntity> {
+  async create(
+    data: UserCreateInput,
+    client: DbClient = this.prisma,
+  ): Promise<UserEntity> {
     const raw = await client.user.create({ data })
     return this.toDomain(raw)
   }

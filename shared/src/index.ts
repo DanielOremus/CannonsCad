@@ -10,6 +10,8 @@ export type { OwnersVehicleDTO } from "./dtos/vehicle.dto.js"
 export {
   registerSchema,
   loginSchema,
+  confirmEmailSchema,
+  type UserConfirmEmailDTO,
   type UserLoginDTO,
   type UserRegisterDTO,
 } from "./validators/user.schema.js"

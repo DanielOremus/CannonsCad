@@ -9,7 +9,7 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
   .object({
-    email: z.email(),
+    email: z.email().toLowerCase(),
     name: nameValidator,
     password: z.string().regex(/^\S*$/, "Must not contain spaces").min(4),
     confirmPassword: z.string(),
@@ -28,7 +28,7 @@ export const updateSelfSchema = z.object({
 })
 
 export const updateEmailSchema = z.object({
-  email: z.email(),
+  email: z.email().toLowerCase,
   password: z.string().trim().nonempty(),
 })
 export const confirmEmailSchema = z.object({

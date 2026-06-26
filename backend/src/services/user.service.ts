@@ -4,7 +4,6 @@ import { NotFoundError, ValidationError } from "../errors/app.error.js"
 import UserMapper from "../mappers/user.mapper.js"
 import emailSender from "../utils/email.sender.js"
 import type {
-  UserConfirmEmailDTO,
   UserUpdateEmailDTO,
   UserUpdateSelfDTO,
 } from "@project/shared/src/validators/user.schema.js"
@@ -39,17 +38,16 @@ class UserService {
   async updateEmail(id: string, dto: UserUpdateEmailDTO) {
     const exists = await this.userRepository.findById(id)
     if (!exists) throw new NotFoundError("User")
-    const isPasswordCorrect = await comparePassword(dto.password, exists.passwordHash)
-    if (!isPasswordCorrect) throw new ValidationError([], "Password is incorrect")
+    const isPasswordCorrect = await comparePassword(
+      dto.password,
+      exists.passwordHash,
+    )
+    if (!isPasswordCorrect)
+      throw new ValidationError([], "Password is incorrect")
     return await this.userRepository.transaction(async (tx) => {
       // this.emailSender.sendNotification()
       // await this.userRepository.update(id, { email: dto.email })
     })
-  }
-  async confirmEmail(id: string, dto: UserConfirmEmailDTO) {
-    const exists = await this.userRepository.findById(id)
-    if (!exists) throw new NotFoundError("User")
-    //add code verification
   }
   async getAll() {
     return await this.userRepository.findMany()

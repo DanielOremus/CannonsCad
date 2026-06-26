@@ -17,7 +17,7 @@ export type CharacterEntity = Readonly<
     address: string | null
     hasGunPermit: boolean
     flags: CharacterFlag[]
-    user: Omit<UserEntity, "passwordHash"> | null
+    user: Pick<UserEntity, "id" | "name"> | null
     vehicles: VehicleEntity[]
   }
 >

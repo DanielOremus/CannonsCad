@@ -2,7 +2,11 @@ import authService from "../../services/auth.service.js"
 import type { NextFunction, Request, Response } from "express"
 import type AuthService from "../../services/auth.service.js"
 import { appConfig } from "../../config/app.js"
-import type { UserRegisterDTO, UserLoginDTO } from "@project/shared"
+import type {
+  UserRegisterDTO,
+  UserLoginDTO,
+  UserConfirmEmailDTO,
+} from "@project/shared"
 
 class AuthController {
   constructor(private authService: typeof AuthService) {}
@@ -38,6 +42,18 @@ class AuthController {
       res.clearCookie("refresh")
       next(error)
     }
+  }
+  confirmEmail = async (
+    req: Request<{}, {}, UserConfirmEmailDTO>,
+    res: Response,
+  ) => {
+    await this.authService.confirmEmail(
+      {
+        id: res.locals.user.id,
+        email: res.locals.user.email,
+      },
+      req.body,
+    )
   }
 }
 

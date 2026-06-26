@@ -1,7 +1,11 @@
 import type { RefreshTokenEntity } from "../domain/refresh.token.entity.js"
 import type { RefreshToken } from "../generated/prisma/client.js"
 import type { IRefreshTokenRepository } from "../interfaces/i.refresh.token.repository.js"
-import { prisma, type DbClient, type ExtendedPrismaClient } from "../lib/prisma.js"
+import {
+  prisma,
+  type DbClient,
+  type ExtendedPrismaClient,
+} from "../lib/prisma.js"
 import type { RefreshCreateInput } from "../types/token.js"
 import { BaseRepository } from "./base.repository.js"
 
@@ -11,10 +15,7 @@ class RefreshTokenRepository
 {
   protected toDomain(raw: RefreshToken): RefreshTokenEntity {
     return {
-      jti: raw.jti,
-      sub: raw.sub,
-      expiresAt: raw.expiresAt,
-      createdAt: raw.createdAt,
+      ...raw,
     }
   }
   constructor(prisma: ExtendedPrismaClient) {
@@ -27,11 +28,17 @@ class RefreshTokenRepository
   async delete(jti: string): Promise<void> {
     await this.prisma.refreshToken.delete({ where: { jti } })
   }
-  async create(dto: RefreshCreateInput, client: DbClient = this.prisma): Promise<RefreshToken> {
+  async create(
+    dto: RefreshCreateInput,
+    client: DbClient = this.prisma,
+  ): Promise<RefreshToken> {
     const token = await client.refreshToken.customCreate(dto.sub)
     return this.toDomain(token)
   }
-  async deleteAllBySub(sub: string, client: DbClient = this.prisma): Promise<void> {
+  async deleteAllBySub(
+    sub: string,
+    client: DbClient = this.prisma,
+  ): Promise<void> {
     await client.refreshToken.deleteMany({ where: { sub } })
   }
 }
