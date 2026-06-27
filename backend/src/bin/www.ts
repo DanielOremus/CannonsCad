@@ -3,6 +3,7 @@ import http from "http"
 import Logger from "../utils/logger.js"
 import { appConfig } from "../config/app.js"
 import type { Application } from "express"
+import { mailer } from "../lib/mailer.js"
 
 class Server {
   private app: Application
@@ -12,15 +13,25 @@ class Server {
     this.app = appInstance
     this.port = this.normalizePort(appConfig.port)
   }
-  setup() {
+  async setup() {
     this.server = http.createServer(this.app)
     this.app.set("port", this.port)
+    await this.verifyMailer()
   }
-  start() {
-    this.setup()
+  async start() {
+    await this.setup()
     this.server.listen(this.port)
     this.server.on("error", this.onError.bind(this))
     this.server.on("listening", this.onListening.bind(this))
+  }
+  async verifyMailer() {
+    try {
+      await mailer.verify()
+      Logger.info("Mailer is ready to work")
+    } catch (error) {
+      Logger.error("Failed to verify mailer transport", error)
+      process.exit(1)
+    }
   }
   normalizePort(v: string): Number {
     const port = parseInt(v, 10)
@@ -35,7 +46,8 @@ class Server {
       throw error
     }
 
-    const bind = typeof this.port === "string" ? "Pipe " + this.port : "Port " + this.port
+    const bind =
+      typeof this.port === "string" ? "Pipe " + this.port : "Port " + this.port
 
     // handle specific listen errors with friendly messages
     switch (error.code) {
@@ -55,7 +67,8 @@ class Server {
   onListening() {
     const address = this.server.address()
     if (!address) return
-    const bind = typeof address === "string" ? "pipe " + address : "port " + address.port
+    const bind =
+      typeof address === "string" ? "pipe " + address : "port " + address.port
     Logger.info("Listening on " + bind)
   }
 }

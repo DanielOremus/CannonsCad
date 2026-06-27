@@ -18,5 +18,8 @@ const config = {
       return process.env.SMTP_PASS
     },
   },
+  tls: {
+    rejectUnauthorized: !["test", "development"].includes(process.env.ENV!),
+  },
 } as const
 export { config as mailerConfig }

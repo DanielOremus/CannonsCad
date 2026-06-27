@@ -6,13 +6,15 @@ class Logger {
     this.debugger = debug(namespace)
   }
   error(message: string, data: unknown): void {
-    this.debugger("%O", { message, data })
+    this.debugger(`${message}\n%O`, data)
   }
-  info(data: any): void {
+  info(data: unknown): void {
     this.debugger("%O", data)
   }
 }
 
 export default new Logger("app:backend")
 
-export { debug }
+export function createLogger(namespace: string) {
+  return new Logger(namespace)
+}
