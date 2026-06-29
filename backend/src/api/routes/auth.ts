@@ -1,26 +1,19 @@
 import { Router } from "express"
 import { catchAsync } from "../middlewares/errorHandler.js"
 import { validateBody } from "../middlewares/validator.js"
-import {
-  confirmEmailSchema,
-  loginSchema,
-  registerSchema,
-} from "@project/shared"
+import { confirmEmailSchema, loginSchema, registerSchema, UserRole } from "@project/shared"
 import authController from "../controllers/authController.js"
+import { authGuard } from "../middlewares/auth.guard.js"
 const router = Router()
 
-router.post(
-  "/register",
-  validateBody(registerSchema),
-  catchAsync(authController.register),
-)
-router.post(
-  "/login",
-  validateBody(loginSchema),
-  catchAsync(authController.login),
-)
+router.post("/register", validateBody(registerSchema), catchAsync(authController.register))
+router.post("/login", validateBody(loginSchema), catchAsync(authController.login))
 router.post(
   "/confirm-email",
+  authGuard("priority", UserRole.REGISTERED, {
+    mustBeApproved: false,
+    emailMustBeConfirmed: false,
+  }),
   validateBody(confirmEmailSchema),
   catchAsync(authController.confirmEmail),
 )

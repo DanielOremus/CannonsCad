@@ -6,16 +6,6 @@ import * as runtime from "@prisma/client/runtime/client"
 
 const adapter = new PrismaPg({ connectionString: dbConfig.url })
 const prisma = new PrismaClient({ adapter }).$extends({
-  model: {
-    refreshToken: {
-      async customCreate(sub: string) {
-        const expiresAt = new Date(Date.now() + appConfig.tokens.refresh.expire * 1000)
-        return await prisma.refreshToken.create({
-          data: { expiresAt, sub },
-        })
-      },
-    },
-  },
   result: {
     character: {
       age: {

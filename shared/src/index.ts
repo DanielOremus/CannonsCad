@@ -1,5 +1,5 @@
 export type { UserMeDTO, UserPublicDTO } from "./dtos/user.dto.js"
-export type { ErrorCode } from "./enums/error.code.js"
+export { ErrorCode } from "./enums/error.code.js"
 export { UserRole, UserRolePriority } from "./enums/user.role.js"
 export { UserStatus } from "./enums/user.status.js"
 export { CharacterFlag, Gender } from "./enums/character.js"

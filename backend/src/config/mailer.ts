@@ -1,4 +1,4 @@
-const config = {
+const transportConfig = {
   get host() {
     if (!process.env.SMTP_HOST) throw new Error("No smtp host provided")
     return process.env.SMTP_HOST
@@ -22,4 +22,9 @@ const config = {
     rejectUnauthorized: !["test", "development"].includes(process.env.ENV!),
   },
 } as const
-export { config as mailerConfig }
+
+const defaults = {
+  from: `${process.env.SMTP_USER_NAME} <${process.env.SMTP_USER}>`,
+}
+export { transportConfig as mailerConfig }
+export { defaults as mailerDefaults }

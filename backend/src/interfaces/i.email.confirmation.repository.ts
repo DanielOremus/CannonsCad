@@ -4,11 +4,8 @@ import type { EmailConfirmationCreateInput } from "../types/email.confirmation.j
 import { type IBaseRepository } from "./i.base.repository.js"
 
 export interface IEmailConfirmationRepository extends IBaseRepository {
-  create(
-    data: EmailConfirmationCreateInput,
-    client?: DbClient,
-  ): Promise<EmailConfirmationEntity>
-  update(): Promise<EmailConfirmationEntity>
-  delete(id: number, client?: DbClient): Promise<void>
+  create(data: EmailConfirmationCreateInput, client?: DbClient): Promise<EmailConfirmationEntity>
+  incrementAttempt(email: string, client?: DbClient): Promise<void>
+  deleteByEmail(email: string, client?: DbClient): Promise<void>
   findByEmail(email: string): Promise<EmailConfirmationEntity | null>
 }

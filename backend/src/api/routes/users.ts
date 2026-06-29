@@ -6,12 +6,12 @@ import { UserRole } from "@project/shared"
 const router = Router()
 
 /* GET users listing. */
-router.get("/me", authGuard(false), catchAsync(userController.getMe))
 router.get(
-  "/:id",
-  authGuard(true, "strict", UserRole.ADMIN),
-  catchAsync(userController.getUserById),
+  "/me",
+  authGuard("priority", "REGISTERED", { emailMustBeConfirmed: true, mustBeApproved: false }),
+  catchAsync(userController.getMe),
 )
-router.patch("/me", authGuard(true, "priority", "CIVILIAN"), catchAsync(userController.updateMe))
+router.get("/:id", authGuard("strict", UserRole.ADMIN), catchAsync(userController.getUserById))
+router.patch("/me", authGuard("priority", "CIVILIAN"), catchAsync(userController.updateMe))
 
 export default router

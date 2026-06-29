@@ -2,6 +2,7 @@ import createError, { type HttpError } from "http-errors"
 import { appConfig } from "../../config/app.js"
 import type { Request, Response, NextFunction } from "express"
 import { AppError, ValidationError } from "../../errors/app.error.js"
+import { Logger } from "../../utils/logger.js"
 
 export function catchNotFound(req: Request, res: Response, next: NextFunction) {
   next(createError(404))
@@ -37,6 +38,7 @@ export function globalErrorHandler(
     errMessage = err.message
     errStatus = "status" in err ? err.status : 500
   }
+  Logger.error(err.message, err)
   // render the error page
   res.status(errStatus)
   res.locals.message = errMessage

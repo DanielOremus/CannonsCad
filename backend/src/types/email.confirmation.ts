@@ -2,5 +2,5 @@ import { type EmailConfirmationEntity } from "../domain/email.confirmation.entit
 
 export type EmailConfirmationCreateInput = Pick<
   EmailConfirmationEntity,
-  "email" | "code"
+  "email" | "code" | "expiresAt"
 >

@@ -14,8 +14,10 @@ export function generateAccess(payload: AccessPayload) {
     expiresIn: appConfig.tokens.access.expire,
   })
 }
-export async function createRefreshToken(data: RefreshCreateInput) {
-  return await prisma.refreshToken.customCreate(data.sub)
+export async function createRefreshToken(sub: string) {
+  return await prisma.refreshToken.create({
+    data: { sub, expiresAt: new Date(Date.now() + appConfig.tokens.refresh.expire * 1000) },
+  })
 }
 export async function getUserRefreshTokens(userId: string) {
   return await prisma.refreshToken.findMany({ where: { sub: userId } })

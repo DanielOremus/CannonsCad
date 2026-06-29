@@ -1,6 +1,6 @@
 import debug from "debug"
 
-class Logger {
+class LoggerClass {
   private debugger: debug.Debugger
   constructor(namespace: string) {
     this.debugger = debug(namespace)
@@ -13,8 +13,8 @@ class Logger {
   }
 }
 
-export default new Logger("app:backend")
+export const Logger = new LoggerClass("app:backend")
 
 export function createLogger(namespace: string) {
-  return new Logger(namespace)
+  return new LoggerClass(namespace)
 }

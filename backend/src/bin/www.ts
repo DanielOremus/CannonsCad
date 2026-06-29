@@ -1,6 +1,6 @@
 import app from "../app.js"
 import http from "http"
-import Logger from "../utils/logger.js"
+import { Logger } from "../utils/logger.js"
 import { appConfig } from "../config/app.js"
 import type { Application } from "express"
 import { mailer } from "../lib/mailer.js"
@@ -46,8 +46,7 @@ class Server {
       throw error
     }
 
-    const bind =
-      typeof this.port === "string" ? "Pipe " + this.port : "Port " + this.port
+    const bind = typeof this.port === "string" ? "Pipe " + this.port : "Port " + this.port
 
     // handle specific listen errors with friendly messages
     switch (error.code) {
@@ -67,8 +66,7 @@ class Server {
   onListening() {
     const address = this.server.address()
     if (!address) return
-    const bind =
-      typeof address === "string" ? "pipe " + address : "port " + address.port
+    const bind = typeof address === "string" ? "pipe " + address : "port " + address.port
     Logger.info("Listening on " + bind)
   }
 }

@@ -32,12 +32,7 @@ export const updateEmailSchema = z.object({
   password: z.string().trim().nonempty(),
 })
 export const confirmEmailSchema = z.object({
-  code: z.coerce
-    .number()
-    .int()
-    .positive()
-    .gte(100000, { error: "Invalid code format" })
-    .lte(999999, { error: "Invalid code format" }),
+  code: z.string().regex(/^\d{6}$/, { error: "Invalid code format" }),
 })
 
 export type UserRegisterDTO = z.infer<typeof registerSchema>
@@ -45,4 +40,3 @@ export type UserLoginDTO = z.infer<typeof loginSchema>
 export type UserUpdateSelfDTO = z.infer<typeof updateSelfSchema>
 export type UserUpdateEmailDTO = z.infer<typeof updateEmailSchema>
 export type UserConfirmEmailDTO = z.infer<typeof confirmEmailSchema>
-export type UserConfirmEmailRequest = z.input<typeof confirmEmailSchema>

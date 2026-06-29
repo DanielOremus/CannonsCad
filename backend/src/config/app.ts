@@ -1,6 +1,13 @@
 const config = {
   port: process.env.PORT || "3000",
   env: process.env.ENV,
+  email: {
+    get confirmExpire() {
+      const defaultValue = 1000 * 60 * 10 //10 m
+      const v = parseInt(`${process.env.ACCESS_TOKEN_EXPIRE}`)
+      return isFinite(v) ? Math.abs(v) : defaultValue
+    },
+  },
   tokens: {
     access: {
       get secret() {

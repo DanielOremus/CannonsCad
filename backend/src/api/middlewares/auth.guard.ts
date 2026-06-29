@@ -9,9 +9,12 @@ import type { UserEntity } from "../../domain/user.entity.js"
 const createAuthGuard =
   (userRepository: IUserRepository) =>
   (
-    onlyWhenApproved: boolean = true,
     roleCheckType: "strict" | "priority" = "priority",
     role: UserRole = UserRole.REGISTERED,
+    account: { mustBeApproved: boolean; emailMustBeConfirmed: boolean } = {
+      mustBeApproved: true,
+      emailMustBeConfirmed: true,
+    },
   ) =>
   async (req: Request, res: Response, next: NextFunction) => {
     const bearer = req.headers.authorization
@@ -20,7 +23,7 @@ const createAuthGuard =
 
     const dbUser = await userRepository.findById(decoded.sub)
     if (!dbUser) return next(new UnauthorizedError())
-    if (!isAccountActive(dbUser)) return next(new ForbiddenError())
+    if (!isAccountSatisfactory(account, dbUser)) return next(new ForbiddenError())
 
     switch (roleCheckType) {
       case "priority":
@@ -49,8 +52,19 @@ const createAuthGuard =
     return next(new ForbiddenError())
   }
 
-function isAccountActive(user: UserEntity) {
-  return user.emailConfirmed && user.status === UserStatus.APPROVED
+function isAccountSatisfactory(
+  reqAccount: { mustBeApproved: boolean; emailMustBeConfirmed: boolean },
+  user: UserEntity,
+) {
+  if (
+    (reqAccount.mustBeApproved && !isAccountApproved(user)) ||
+    (reqAccount.emailMustBeConfirmed && !user.emailConfirmed)
+  )
+    return false
+  return true
+}
+function isAccountApproved(user: UserEntity) {
+  return user.status === UserStatus.APPROVED
 }
 
 export const authGuard = createAuthGuard(userRepository)

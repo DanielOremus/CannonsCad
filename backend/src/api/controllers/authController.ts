@@ -2,11 +2,7 @@ import authService from "../../services/auth.service.js"
 import type { NextFunction, Request, Response } from "express"
 import type AuthService from "../../services/auth.service.js"
 import { appConfig } from "../../config/app.js"
-import type {
-  UserRegisterDTO,
-  UserLoginDTO,
-  UserConfirmEmailDTO,
-} from "@project/shared"
+import type { UserRegisterDTO, UserLoginDTO, UserConfirmEmailDTO } from "@project/shared"
 
 class AuthController {
   constructor(private authService: typeof AuthService) {}
@@ -43,10 +39,7 @@ class AuthController {
       next(error)
     }
   }
-  confirmEmail = async (
-    req: Request<{}, {}, UserConfirmEmailDTO>,
-    res: Response,
-  ) => {
+  confirmEmail = async (req: Request<{}, {}, UserConfirmEmailDTO>, res: Response) => {
     await this.authService.confirmEmail(
       {
         id: res.locals.user.id,
@@ -54,6 +47,7 @@ class AuthController {
       },
       req.body,
     )
+    res.status(204).send()
   }
 }
 

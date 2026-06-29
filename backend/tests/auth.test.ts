@@ -7,7 +7,7 @@ import {
   generateRefresh,
   getUserRefreshTokens,
 } from "./factories/token.factory.js"
-import { v4 as uuid4 } from "uuid"
+import { randomUUID } from "node:crypto"
 import { userCreateData } from "./constants/user.js"
 
 describe("POST /auth/login", () => {
@@ -76,9 +76,9 @@ describe("POST /auth/refresh", () => {
 
   it("returns 401, when refresh token has invalid jti", async () => {
     const { id } = await createUser()
-    await createRefreshToken({ sub: id })
+    await createRefreshToken(id)
 
-    const badToken = generateRefresh({ sub: id, jti: uuid4() })
+    const badToken = generateRefresh({ sub: id, jti: randomUUID() })
 
     const res = await request(app)
       .post("/auth/refresh")
@@ -92,7 +92,7 @@ describe("POST /auth/refresh", () => {
 
   it("returns 200, when refresh token is valid", async () => {
     const { id } = await createUser()
-    const dbToken = await createRefreshToken({ sub: id })
+    const dbToken = await createRefreshToken(id)
     const goodToken = generateRefresh({ jti: dbToken.jti, sub: id })
 
     const res = await request(app)
