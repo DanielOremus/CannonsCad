@@ -1,7 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient, type Character } from "../generated/prisma/client.js"
 import { dbConfig } from "../config/db.js"
-import { appConfig } from "../config/app.js"
 import * as runtime from "@prisma/client/runtime/client"
 
 const adapter = new PrismaPg({ connectionString: dbConfig.url })
@@ -20,5 +19,8 @@ const prisma = new PrismaClient({ adapter }).$extends({
 
 export { prisma }
 export type ExtendedPrismaClient = typeof prisma
-export type ExtendedTransactionClient = Omit<ExtendedPrismaClient, runtime.ITXClientDenyList>
+export type ExtendedTransactionClient = Omit<
+  ExtendedPrismaClient,
+  runtime.ITXClientDenyList
+>
 export type DbClient = ExtendedPrismaClient | ExtendedTransactionClient
